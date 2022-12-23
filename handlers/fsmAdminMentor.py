@@ -2,9 +2,8 @@ from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from config import bot
 from keyboards.client_kb import cancel_markup, submit_markup
-
+from database.bot_db import sql_command_insert
 
 class FSMAdmin(StatesGroup):
     id = State()
@@ -17,18 +16,20 @@ class FSMAdmin(StatesGroup):
 
 async def fsm_start(message: types.Message):
     if message.chat.type == 'private':
-        await FSMAdmin.name.set()
+        await FSMAdmin.id.set()
         await message.answer("id ментора?", reply_markup=cancel_markup)
     else:
         await message.answer("Пиши в личке!")
 
 
 async def load_id(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['id'] = int(message.text)
-    await FSMAdmin.next()
-    await message.answer("имя ментора?")
-
+    try:
+        async with state.proxy() as data:
+            data['id'] = int(message.text)
+        await FSMAdmin.next()
+        await message.answer("имя ментора?")
+    except ValueError:
+        await message.answer("id должно быть числом")
 
 async def load_name(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
@@ -64,7 +65,7 @@ async def load_gruppa(message: types.Message, state: FSMContext):
 
 async def submit(message: types.Message, state: FSMContext):
     if message.text.lower() == "да":
-        # Запись в БД
+        await sql_command_insert(state)
         await state.finish()
         await message.answer("всё")
     elif message.text.lower() == "нет":

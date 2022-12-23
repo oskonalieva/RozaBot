@@ -60,7 +60,6 @@ async def mem_handler(message: types.Message):
     photo = open('media/mem 1.jpeg', 'rb')
     await bot.send_photo(message.from_user.id, photo=photo)
 
-
 def register_handler_client(dp: Dispatcher):
     dp.register_message_handler(start_handler, commands=['start'])
     dp.register_message_handler(quiz_1, commands=['quiz'])
