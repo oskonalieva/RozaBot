@@ -7,7 +7,7 @@ import asyncio
 async def get_id(message: types.Message):
     global chat_id
     chat_id = message.from_user.id
-    await message.answer("Хорошо!")
+    await message.answer("ID получен!")
 
 
 async def go_to_library():
@@ -15,12 +15,11 @@ async def go_to_library():
 
 
 async def scheduler():
-    aioschedule.every().saturday.at('11:00').do(go_to_library())
+    aioschedule.every().saturday.at('11:00').do(go_to_library)
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(2)
 
 
 def register_handlers_notification(dp: Dispatcher):
-    dp.register_message_handler(get_id,
-                                lambda word: "напомни" in word.text)
+    dp.register_message_handler(get_id, lambda word: "напомни" in word.text)
